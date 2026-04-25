@@ -719,7 +719,7 @@ cursor: pointer;
 /* Reusable button variants */
 .btn-icon { padding: 10px; border-radius: 12px; border: 1px solid var(–border); background: var(–card); color: var(–text); font-family: ‘DM Sans’, sans-serif; font-size: 18px; cursor: pointer; transition: background 0.15s; }
 .btn-icon:active { background: var(–card2); }
-.btn-sm { padding: 7px 14px; border-radius: 10px; border: 1px solid var(–border); background: var(–card); color: var(–text); font-family: ‘DM Sans’, sans-serif; font-size: 13px; cursor: pointer; }
+.btn-sm { padding: 7px 14px; border-radius: 10px; border: 1px solid #332d23 !important; background: #242018 !important; color: #f2e8d5 !important; font-family: ‘DM Sans’, sans-serif; font-size: 13px; cursor: pointer; }
 .btn-danger-outline { padding: 12px; border-radius: 12px; border: 1px solid var(–danger); background: rgba(192,64,64,0.08); color: var(–danger); font-family: ‘DM Sans’, sans-serif; font-size: 14px; cursor: pointer; width: 100%; margin-top: 20px; }
 .btn-green-outline { padding: 10px; border-radius: 12px; border: 1px solid var(–green); background: rgba(74,158,110,0.1); color: var(–green); font-family: ‘DM Sans’, sans-serif; font-size: 13px; cursor: pointer; width: 100%; }
 .quick-action-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
@@ -803,17 +803,29 @@ margin-bottom: 2px;
 </details>
 
 <div class="form-group">
-  <label>Icon</label>
-  <details id="emoji-details">
-    <summary style="cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px">
-      <span id="emoji-preview" style="font-size:26px">🍅</span>
-      <span id="emoji-hint" style="font-size:13px;color:var(--muted)">e.g. 🌮 🍕 🥗 — tap to pick</span>
-      <span style="margin-left:auto;font-size:12px;color:var(--muted)">›</span>
-    </summary>
-    <div style="padding-top:8px">
-      <div class="emoji-picker" id="emoji-row"></div>
-    </div>
-  </details>
+  <label>Photo or Icon</label>
+  <!-- Photo preview (shown when photo is set) -->
+  <div id="photo-preview-wrap" style="display:none;position:relative;margin-bottom:8px">
+    <img id="photo-preview-img" src="" alt="Recipe photo" style="width:100%;max-height:180px;object-fit:cover;border-radius:12px;display:block">
+    <button onclick="clearRecipePhoto()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);border:none;color:#fff;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
+  </div>
+  <!-- Upload + Emoji row -->
+  <div style="display:flex;gap:8px;margin-bottom:8px">
+    <button onclick="triggerPhotoUpload()" style="flex:1;padding:10px;background:#242018;border:1px dashed #332d23;border-radius:10px;color:#c8b99a;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+      📷 Upload Photo
+    </button>
+    <input type="file" id="photo-upload-input" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
+    <details id="emoji-details" style="flex:1">
+      <summary style="cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;padding:10px;background:#242018;border:1px solid #332d23;border-radius:10px;height:100%">
+        <span id="emoji-preview" style="font-size:22px">🍅</span>
+        <span id="emoji-hint" style="font-size:12px;color:#7a6e5e">pick emoji</span>
+        <span style="margin-left:auto;font-size:12px;color:#7a6e5e">›</span>
+      </summary>
+      <div style="padding-top:8px">
+        <div class="emoji-picker" id="emoji-row"></div>
+      </div>
+    </details>
+  </div>
 </div>
 
 <div class="form-group">
@@ -859,7 +871,17 @@ margin-bottom: 2px;
     Ingredients <span style="color:var(--muted);font-weight:400">— one per line</span>
     <button type="button" onclick="cleanRecipeData()" style="background:rgba(232,176,74,0.2);border:1px solid var(--accent);color:var(--accent);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-weight:500">✨ Clean</button>
   </label>
-  <textarea id="r-ingredients" placeholder="e.g. 2 cups flour&#10;1 tsp salt&#10;3 garlic cloves&#10;1 cup milk"></textarea>
+  <textarea id="r-ingredients" placeholder="e.g. 2 cups flour&#10;1 tsp salt&#10;3 garlic cloves&#10;1 cup milk" oninput="scanCuttingBoard()"></textarea>
+  <!-- CUTTING BOARD -->
+  <div id="cutting-board" style="display:none">
+    <div class="cb-wood">
+      <div class="cb-handle"></div>
+      <div class="cb-surface">
+        <div id="cb-items" class="cb-items"></div>
+        <div class="cb-grain"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="form-group">
@@ -1203,9 +1225,9 @@ margin-bottom: 2px;
 
 <!-- QUICK ACTIONS -->
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-  <button onclick="addPantryStaples()" class="btn-sm" style="border-color:var(--green);color:var(--green)">+ Staples</button>
-  <button onclick="addOutToShop()" class="btn-sm" style="border-color:var(--danger);color:var(--danger)">Add Out</button>
-  <button onclick="addLowToShop()" class="btn-sm" style="border-color:var(--accent);color:var(--accent)">Add Low</button>
+  <button onclick="addPantryStaples()" class="btn-sm" style="border-color:#4a9e6e !important;color:#4a9e6e !important">+ Staples</button>
+  <button onclick="addOutToShop()" class="btn-sm" style="border-color:#c04040 !important;color:#c04040 !important">Add Out</button>
+  <button onclick="addLowToShop()" class="btn-sm" style="border-color:#d4922a !important;color:#d4922a !important">Add Low</button>
 </div>
 
 <button onclick="clearPantry()" class="btn-danger-outline" style="margin-top:4px">🗑 Clear Pantry</button>
@@ -1319,7 +1341,58 @@ function saveShop() {
   }
 }
 
-// ── SETTINGS / EXPORT / IMPORT (DATA BACKUP) ────────
+// ── PHOTO UPLOAD ──────────────────────────────────────
+let selectedPhoto = null;
+
+function triggerPhotoUpload() {
+  document.getElementById('photo-upload-input').click();
+}
+
+function handlePhotoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { showToast('Please pick an image file', 'error'); return; }
+
+  // Resize to max 800px wide to keep localStorage size reasonable
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const MAX = 800;
+      let w = img.width, h = img.height;
+      if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+      selectedPhoto = dataUrl;
+      // Show preview
+      document.getElementById('photo-preview-img').src = dataUrl;
+      document.getElementById('photo-preview-wrap').style.display = 'block';
+      showToast('📷 Photo added!');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  // Reset input so same file can be re-selected
+  event.target.value = '';
+}
+
+function clearRecipePhoto() {
+  selectedPhoto = null;
+  document.getElementById('photo-preview-img').src = '';
+  document.getElementById('photo-preview-wrap').style.display = 'none';
+}
+
+function loadPhotoIntoForm(recipe) {
+  if (recipe && recipe.photo) {
+    selectedPhoto = recipe.photo;
+    document.getElementById('photo-preview-img').src = recipe.photo;
+    document.getElementById('photo-preview-wrap').style.display = 'block';
+  } else {
+    clearRecipePhoto();
+  }
+}
 function openSettings() {
   const overlay = document.getElementById('settings-overlay');
   if (overlay) overlay.classList.add('active');
@@ -1379,7 +1452,7 @@ function importData() {
           return;
         }
         const recipeCount = data.recipes.length;
-        if (!confirm(`Import ${recipeCount} recipes? This will REPLACE your current data.`)) return;
+        if (recipeCount === 0) { showToast('No recipes found in file', 'error'); return; }
         recipes = data.recipes;
         if (data.shopping && Array.isArray(data.shopping)) shopList = data.shopping;
         if (data.pantry && Array.isArray(data.pantry)) pantry = data.pantry;
@@ -2118,7 +2191,11 @@ function showCanMake() {
   } else {
     grid.innerHTML = scored.map(r =>
       `<div class="recipe-card" onclick="const c=this;c.classList.add('bouncing');setTimeout(()=>{c.classList.remove('bouncing');showDetail('${r.id}');},320);">
-        <div class="recipe-card-emoji" onclick="bounceEmoji(event)"><span>${r.emoji}</span></div>
+        <div class="recipe-card-emoji" onclick="bounceEmoji(event)">
+          ${r.photo
+            ? `<img src="${r.photo}" alt="${r.name}" style="width:100%;height:100%;object-fit:cover;display:block">`
+            : `<span>${r.emoji || '🍽️'}</span>`}
+        </div>
         <div class="recipe-card-info">
           <div class="recipe-card-title">${r.name}</div>
           <div class="recipe-card-meta" style="color:${r.pct===100?'var(--green)':'var(--accent)'}">${r.pct}% ingredients on hand</div>
@@ -2147,6 +2224,7 @@ function showAdd() {
   document.getElementById('r-difficulty').value = '';
   document.getElementById('save-btn').textContent = 'Save Recipe';
   document.getElementById('delete-btn-container').innerHTML = '';
+  clearRecipePhoto();
   buildEmojiPicker(); buildAutoTags();
   setView('add-view'); setNav('nav-add');
 }
@@ -2159,7 +2237,14 @@ function showDetail(id) {
   baseServings = parseInt(currentRecipe.servings) || 4;
   currentServings = baseServings;
 
-  document.getElementById('d-emoji').textContent = currentRecipe.emoji;
+  const dEmoji = document.getElementById('d-emoji');
+  if (currentRecipe.photo) {
+    dEmoji.innerHTML = `<img src="${currentRecipe.photo}" alt="${currentRecipe.name}" style="width:100%;max-height:220px;object-fit:cover;border-radius:14px;display:block;margin-bottom:4px">`;
+    dEmoji.style.fontSize = '0';
+  } else {
+    dEmoji.textContent = currentRecipe.emoji || '🍽️';
+    dEmoji.style.fontSize = '';
+  }
   document.getElementById('d-title').textContent = currentRecipe.name;
   document.getElementById('d-servings').textContent = currentServings;
 
@@ -2476,7 +2561,7 @@ function clearBought() {
 
 function clearAllShop() {
   if (!shopList.length) { showToast('List is already empty'); return; }
-  if (!confirm(`Clear all ${shopList.length} items from shopping list?`)) return;
+  const backup = [...shopList];
   shopList = [];
   saveShop(); renderShopList(); updateShopProgress(); updateCartBadge();
   showToast('Shopping list cleared');
@@ -2486,6 +2571,7 @@ const AISLE_LABELS = { produce: '🥦 Fresh', dairy: '🧀 Dairy & Eggs', meat: 
 
 function renderShopList() {
   try {
+  const sortVal = document.getElementById('shop-sort')?.value || 'aisle';
   const container = document.getElementById('shop-list');
   const statsEl = document.getElementById('shop-stats');
 
@@ -2675,6 +2761,7 @@ function saveRecipe() {
       id: editingId || Date.now().toString(),
       name,
       emoji: selectedEmoji || '🍽️',
+      photo: selectedPhoto || null,
       tags: document.getElementById('r-tag').value.trim(),
       tag: document.getElementById('r-tag').value.trim(),
       servings: document.getElementById('r-servings').value || 4,
@@ -2716,6 +2803,7 @@ function editCurrent() {
   document.getElementById('save-btn').textContent = 'Update Recipe';
   document.getElementById('delete-btn-container').innerHTML =
     `<button class="btn btn-danger" onclick="deleteRecipe(editingId)">🗑 Delete Recipe</button>`;
+  loadPhotoIntoForm(currentRecipe);
   buildEmojiPicker(); buildAutoTags();
   setView('add-view'); setNav('nav-add');
 }
@@ -2731,24 +2819,28 @@ function editRecipe(id) {
 function deleteRecipe(id) {
   const r = recipes.find(x => x.id === id);
   if (!r) return;
-  if (!confirm(`Delete "${r.name}"? This cannot be undone.`)) return;
-  recipes = recipes.filter(r => r.id !== id);
+  const name = r.name;
+  recipes = recipes.filter(x => x.id !== id);
   saveData();
   showHome();
-  showToast('Recipe deleted');
+  showToast(`🗑 "${name}" deleted`);
 }
 
 function addRecipeToShop(id) {
   const r = recipes.find(x => x.id === id);
-  if (!r || !r.ingredients) return;
+  if (!r || !r.ingredients) { showToast('No ingredients found', 'error'); return; }
   const ings = r.ingredients.split('\n').map(i => i.trim()).filter(Boolean);
+  let added = 0;
   ings.forEach(ing => {
-    if (!shop.find(s => s.item.toLowerCase() === ing.toLowerCase())) {
-      shop.push({ item: ing, done: false, recipe: r.name });
+    const exists = shopList.find(s => s.text.toLowerCase() === ing.toLowerCase());
+    if (!exists) {
+      shopList.push({ id: Date.now().toString() + Math.random(), text: ing, bought: false, source: r.name });
+      added++;
     }
   });
-  saveData();
-  showToast(`Added ${ings.length} ingredients to shopping list`);
+  saveShop();
+  showToast(`Added ${added} ingredient${added !== 1 ? 's' : ''} to shopping list`);
+  if (added < ings.length) showToast(`${ings.length - added} already in list`);
 }
 
 function cancelEdit() { if (currentRecipe) showDetail(); else showHome(); }
@@ -2765,12 +2857,12 @@ function closeRecipeMenu(e) {
 }
 function deleteRecipeFromMenu() {
   if (!currentRecipe) return;
-  if (!confirm(`Delete "${currentRecipe.name}"? This cannot be undone.`)) return;
+  const name = currentRecipe.name;
   const overlay = document.getElementById('recipe-menu-overlay');
   if (overlay) overlay.classList.remove('active');
   recipes = recipes.filter(r => r.id !== currentRecipe.id);
   saveData(); showHome();
-  showToast('Recipe deleted');
+  showToast(`🗑 "${name}" deleted`);
 }
 
 // ── INLINE EDITING ────────────────────────────────────
@@ -2859,7 +2951,11 @@ function renderGrid(list) {
       `<div class="recipe-card ${r.fav ? 'fav' : ''}" onclick="const c=this;c.classList.add('bouncing');setTimeout(()=>{c.classList.remove('bouncing');showDetail('${r.id}');},320);">
         ${r.fav ? '<div class="fav-star">❤️</div>' : ''}
         ${r.difficulty ? `<div class="difficulty-badge">${r.difficulty}</div>` : ''}
-        <div class="recipe-card-emoji" onclick="bounceEmoji(event)"><span>${r.emoji || '🍽️'}</span></div>
+        <div class="recipe-card-emoji" onclick="bounceEmoji(event)">
+          ${r.photo
+            ? `<img src="${r.photo}" alt="${r.name}" style="width:100%;height:100%;object-fit:cover;display:block">`
+            : `<span>${r.emoji || '🍽️'}</span>`}
+        </div>
         <div class="recipe-card-info">
           <div class="recipe-card-title">${r.name || 'Untitled'}</div>
           <div class="recipe-card-meta">${(r.tags||r.tag||'').split(',')[0]||''} ${r.cook ? '· '+r.cook : ''}</div>
@@ -3430,7 +3526,6 @@ function removeStaples() {
 
 function clearPantry() {
   if (!pantry.length) { showToast('Pantry is already empty'); return; }
-  if (!confirm(`Clear all ${pantry.length} items from pantry?`)) return;
   pantrySnapshot();
   pantry = [];
   savePantry(); renderPantryList(); renderPantrySummary();
