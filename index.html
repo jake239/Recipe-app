@@ -3,8 +3,23 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Recetario</title>
+
+<!-- iOS Home Screen / PWA -->
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Recetario">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#100e0b">
+<meta name="description" content="A beautiful recipe manager with smart import, shopping list, and pantry tracking.">
+
+<!-- Apple Touch Icon (SVG inline as data URI) -->
+
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23100e0b'/%3E%3Ctext x='90' y='125' font-size='110' text-anchor='middle' font-family='system-ui'%3E%F0%9F%8D%85%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23100e0b'/%3E%3Ctext x='90' y='125' font-size='110' text-anchor='middle' font-family='system-ui'%3E%F0%9F%8D%85%3C/text%3E%3C/svg%3E">
+
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -119,8 +134,23 @@ transform-origin: center;
 100% { transform: scale(1); }
 }
 .star.lit { animation: starPop 0.2s ease; }
-body { font-family: ‘DM Sans’, sans-serif; background: var(–bg); color: var(–text); min-height: 100vh; display: flex; flex-direction: column; }
-#app-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+html { background-color: #100e0b; min-height: 100vh; min-height: -webkit-fill-available; height: 100%; }
+body { font-family: ‘DM Sans’, sans-serif; background-color: #100e0b; color: var(–text); min-height: 100vh; min-height: -webkit-fill-available; height: 100%; display: flex; flex-direction: column; margin: 0; padding: 0; overscroll-behavior: none; }
+#app-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; background-color: #100e0b; overscroll-behavior: contain; }
+
+/* iOS Safari default reset — prevents white system styling on inputs/buttons */
+input, textarea, button, select {
+-webkit-appearance: none;
+appearance: none;
+font-family: inherit;
+color-scheme: dark;
+}
+input[type=“text”], input[type=“search”], input[type=“number”], textarea {
+background-color: var(–card);
+color: var(–text);
+}
+input[type=“number”]::-webkit-outer-spin-button,
+input[type=“number”]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
 /* HEADER */
 header { background: rgba(28,24,20,0.85); backdrop-filter: blur(24px) saturate(1.6); -webkit-backdrop-filter: blur(24px) saturate(1.6); border-bottom: 1px solid rgba(212,146,42,0.12); padding: 16px 20px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,240,200,0.04); flex-shrink: 0; }
@@ -142,8 +172,8 @@ header { background: rgba(28,24,20,0.85); backdrop-filter: blur(24px) saturate(1
 .tab.active { background: linear-gradient(135deg, var(–accent-light), var(–accent)); color: var(–bg); border-color: var(–accent); font-weight: 600; box-shadow: 0 2px 12px rgba(212,146,42,0.3); }
 
 /* VIEWS */
-.view { display: none; }
-.view.active { display: block; }
+.view { display: none; background-color: #100e0b; min-height: 100%; padding-bottom: 100px; }
+.view.active { display: block; background-color: #100e0b; }
 
 /* RECIPE GRID */
 .recipe-grid { padding: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -801,11 +831,15 @@ margin-bottom: 2px;
     <div class="detail-meta" id="d-meta"></div>
     <div class="tag-row" id="d-tags"></div>
     <div class="star-row" id="d-stars"></div>
-    <div style="display:flex;gap:8px;margin-top:12px">
-      <button onclick="startCooking()" class="btn" style="flex:2;padding:12px;font-size:14px;font-weight:600;background:linear-gradient(135deg,var(--accent-light),var(--accent));color:var(--bg);border:none;box-shadow:0 4px 20px rgba(212,146,42,0.3)">🍳 Cook Mode</button>
-      <button onclick="toggleFav()" id="fav-btn" class="btn-icon" style="flex:1">⭐</button>
-      <button onclick="openShare()" class="btn-icon" style="flex:1">📤</button>
-      <button onclick="showRecipeMenu()" class="btn-icon" style="flex:1">⋯</button>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <button onclick="startCooking()" class="btn" style="flex:1;min-width:140px;padding:12px;font-size:14px;font-weight:600;background:linear-gradient(135deg,var(--accent-light),var(--accent));color:var(--bg);border:none;box-shadow:0 4px 20px rgba(212,146,42,0.3)">🍳 Cook Mode</button>
+      <button onclick="toggleFav()" id="fav-btn" class="btn-icon" style="flex:0 0 auto;min-width:48px">⭐</button>
+      <button onclick="openShare()" class="btn-icon" style="flex:0 0 auto;min-width:48px">📤</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button onclick="editCurrent()" class="btn" style="flex:1;padding:10px;font-size:13px;background:rgba(212,146,42,0.15);border:1px solid rgba(212,146,42,0.3);color:var(--accent);font-weight:500">✏️ Edit Recipe</button>
+      <button onclick="duplicateRecipe()" class="btn" style="flex:1;padding:10px;font-size:13px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text2);font-weight:500">📋 Duplicate</button>
+      <button onclick="deleteRecipeFromMenu()" class="btn" style="flex:1;padding:10px;font-size:13px;background:rgba(192,64,64,0.15);border:1px solid rgba(192,64,64,0.3);color:var(--danger);font-weight:500">🗑 Delete</button>
     </div>
   </div>
 
@@ -1175,6 +1209,69 @@ const AUTO_TAG_SUGGESTIONS = ['Mexican','Italian','Asian','American','Vegan','Ve
 
 function saveData() { localStorage.setItem('recetario_v2', JSON.stringify(recipes)); }
 function saveShop() { localStorage.setItem('recetario_shop', JSON.stringify(shopList)); }
+
+// ── EXPORT / IMPORT (DATA BACKUP) ────────────────────
+function exportData() {
+  try {
+    const data = {
+      version: 2,
+      exportedAt: new Date().toISOString(),
+      recipes: recipes || [],
+      shopping: shopList || [],
+      pantry: pantry || [],
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const date = new Date().toISOString().split('T')[0];
+    a.href = url;
+    a.download = `recetario-backup-${date}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`✅ Backup saved (${recipes.length} recipes)`);
+  } catch (err) {
+    console.error('Export failed:', err);
+    showToast('Export failed. Try again.', 'error');
+  }
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (!data.recipes || !Array.isArray(data.recipes)) {
+          showToast('Invalid backup file', 'error');
+          return;
+        }
+        const recipeCount = data.recipes.length;
+        if (!confirm(`Import ${recipeCount} recipes? This will REPLACE your current data.`)) return;
+        recipes = data.recipes;
+        if (data.shopping && Array.isArray(data.shopping)) shopList = data.shopping;
+        if (data.pantry && Array.isArray(data.pantry)) pantry = data.pantry;
+        saveData();
+        if (typeof saveShop === 'function') saveShop();
+        if (typeof savePantry === 'function') savePantry();
+        showHome();
+        showToast(`✅ Imported ${recipeCount} recipes`);
+      } catch (err) {
+        console.error('Import failed:', err);
+        showToast('Could not read backup file', 'error');
+      }
+    };
+    reader.onerror = () => showToast('Could not read file', 'error');
+    reader.readAsText(file);
+  };
+  input.click();
+}
 
 // ── TOAST ─────────────────────────────────────────────
 // ── SHOPPING PROMPT ──────────────────────────────────
@@ -2235,8 +2332,11 @@ function clearBought() {
 }
 
 function clearAllShop() {
+  if (!shopList.length) { showToast('List is already empty'); return; }
+  if (!confirm(`Clear all ${shopList.length} items from shopping list?`)) return;
   shopList = [];
   saveShop(); renderShopList(); updateShopProgress(); updateCartBadge();
+  showToast('Shopping list cleared');
 }
 
 const AISLE_LABELS = { produce: '🥦 Fresh', dairy: '🧀 Dairy & Eggs', meat: '🥩 Meat & Fish', pantry: '🫙 Dry & Canned', frozen: '🧊 Frozen', other: '🛒 Other' };
@@ -2463,7 +2563,7 @@ function editCurrent() {
   document.getElementById('paste-raw').value = '';
   document.getElementById('save-btn').textContent = 'Update Recipe';
   document.getElementById('delete-btn-container').innerHTML =
-    `<button class="btn btn-danger" onclick="deleteRecipe()">🗑 Delete Recipe</button>`;
+    `<button class="btn btn-danger" onclick="deleteRecipe(editingId)">🗑 Delete Recipe</button>`;
   buildEmojiPicker(); buildAutoTags();
   setView('add-view'); setNav('nav-add');
 }
@@ -2473,10 +2573,13 @@ function editRecipe(id) {
   if (!r) return;
   currentRecipe = r;
   editingId = id;
-  showEdit();
+  editCurrent();
 }
 
 function deleteRecipe(id) {
+  const r = recipes.find(x => x.id === id);
+  if (!r) return;
+  if (!confirm(`Delete "${r.name}"? This cannot be undone.`)) return;
   recipes = recipes.filter(r => r.id !== id);
   saveData();
   showHome();
@@ -2509,7 +2612,10 @@ function closeRecipeMenu(e) {
     document.getElementById('recipe-menu-overlay').classList.remove('open');
 }
 function deleteRecipeFromMenu() {
-  closeRecipeMenu();
+  if (!currentRecipe) return;
+  if (!confirm(`Delete "${currentRecipe.name}"? This cannot be undone.`)) return;
+  const overlay = document.getElementById('recipe-menu-overlay');
+  if (overlay) overlay.classList.remove('active');
   recipes = recipes.filter(r => r.id !== currentRecipe.id);
   saveData(); showHome();
   showToast('Recipe deleted');
@@ -2604,11 +2710,6 @@ function renderGrid(list) {
       <div class="recipe-card-info">
         <div class="recipe-card-title">${r.name}</div>
         <div class="recipe-card-meta">${(r.tags||r.tag||'').split(',')[0]||''} ${r.cook ? '· '+r.cook : ''}</div>
-        <div class="recipe-card-actions" style="display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,240,200,0.08)">
-          <button onclick="event.stopPropagation();editRecipe('${r.id}')" style="flex:1;background:rgba(212,146,42,0.15);border:1px solid rgba(212,146,42,0.3);color:var(--accent);padding:6px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:500">✎ Edit</button>
-          <button onclick="event.stopPropagation();addRecipeToShop('${r.id}')" style="flex:1;background:rgba(74,158,110,0.15);border:1px solid rgba(74,158,110,0.3);color:var(--green);padding:6px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:500">🛒 Add</button>
-          <button onclick="event.stopPropagation();deleteRecipe('${r.id}')" style="flex:1;background:rgba(192,64,64,0.15);border:1px solid rgba(192,64,64,0.3);color:var(--danger);padding:6px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:500">🗑 Del</button>
-        </div>
       </div>
     </div>`
   ).join('');
@@ -3150,7 +3251,8 @@ function removeStaples() {
 }
 
 function clearPantry() {
-
+  if (!pantry.length) { showToast('Pantry is already empty'); return; }
+  if (!confirm(`Clear all ${pantry.length} items from pantry?`)) return;
   pantrySnapshot();
   pantry = [];
   savePantry(); renderPantryList(); renderPantrySummary();
