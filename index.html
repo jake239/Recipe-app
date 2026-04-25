@@ -382,7 +382,7 @@ select option { background: var(–card); }
 /* SERVINGS + UNIT */
 .servings-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .servings-control { display: flex; align-items: center; gap: 12px; }
-.servings-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(–border); background: var(–card); color: var(–text); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.servings-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid #332d23 !important; background: #242018 !important; color: #f2e8d5 !important; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .servings-num { font-family: ‘Playfair Display’, serif; font-size: 20px; min-width: 26px; text-align: center; }
 .unit-toggle { margin-left: auto; display: flex; border-radius: 8px; overflow: hidden; border: 1px solid var(–border); }
 .unit-btn { padding: 5px 10px; background: transparent; border: none; color: var(–muted); font-family: ‘DM Sans’, sans-serif; font-size: 12px; cursor: pointer; }
@@ -395,6 +395,73 @@ select option { background: var(–card); }
 .ing-check.checked { background: var(–accent); border-color: var(–accent); color: var(–bg); font-size: 11px; }
 .ingredient-item.checked-item .ing-text { text-decoration: line-through; color: var(–muted); }
 .add-to-shop { margin-left: auto; font-size: 16px; cursor: pointer; padding: 2px 4px; }
+
+/* CUTTING BOARD */
+#cutting-board { margin-top: 12px; animation: cbFadeIn 0.4s ease; }
+@keyframes cbFadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
+.cb-wood {
+position: relative;
+border-radius: 14px 14px 14px 6px;
+overflow: hidden;
+box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.05) inset;
+}
+.cb-handle {
+position: absolute;
+left: -18px; top: 50%; transform: translateY(-50%);
+width: 22px; height: 48px;
+background: linear-gradient(180deg, #6b4423 0%, #4a2e16 50%, #6b4423 100%);
+border-radius: 4px 0 0 4px;
+box-shadow: inset -2px 0 4px rgba(0,0,0,0.3);
+}
+.cb-surface {
+background:
+repeating-linear-gradient(
+92deg,
+transparent 0px, transparent 18px,
+rgba(0,0,0,0.06) 18px, rgba(0,0,0,0.06) 19px
+),
+repeating-linear-gradient(
+180deg,
+transparent 0px, transparent 12px,
+rgba(0,0,0,0.04) 12px, rgba(0,0,0,0.04) 13px
+),
+linear-gradient(160deg, #c68642 0%, #a0522d 30%, #8b4513 55%, #a0522d 75%, #c68642 100%);
+padding: 16px 16px 16px 16px;
+min-height: 90px;
+border-radius: 14px;
+position: relative;
+border: 3px solid #6b3a1f;
+}
+/* Wood grain overlay */
+.cb-grain {
+position: absolute; inset: 0; border-radius: 12px; pointer-events: none;
+background: repeating-linear-gradient(
+175deg,
+transparent 0px, transparent 6px,
+rgba(255,255,255,0.03) 6px, rgba(255,255,255,0.03) 7px
+);
+}
+/* Edge highlight */
+.cb-surface::before {
+content: ‘’; position: absolute;
+top: 3px; left: 3px; right: 3px; bottom: 3px;
+border-radius: 10px;
+border: 1px solid rgba(255,220,150,0.15);
+pointer-events: none;
+}
+.cb-items { display: flex; flex-wrap: wrap; gap: 10px; position: relative; z-index: 1; }
+
+/* Each ingredient chip on the board */
+.cb-item {
+display: flex; flex-direction: column; align-items: center; gap: 1px;
+animation: cbItemPop 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes cbItemPop {
+from { opacity:0; transform: scale(0.4) rotate(-10deg); }
+to   { opacity:1; transform: scale(1)   rotate(0deg); }
+}
+.cb-item-emoji { font-size: 30px; line-height: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); }
+.cb-item-label { font-size: 9px; color: rgba(255,240,200,0.7); font-family: ‘DM Sans’,sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; max-width: 52px; text-align: center; line-height: 1.2; }
 
 /* STEPS */
 .step-item { display: flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(–border); cursor: pointer; transition: background 0.15s; border-radius: 8px; }
@@ -799,6 +866,7 @@ margin-bottom: 2px;
     <div style="display:flex;gap:8px;margin-bottom:8px">
       <button class="parse-btn" onclick="autoFill()" style="flex:1">📝 Auto-Fill</button>
     </div>
+    <p style="font-size:11px;color:var(--muted);margin:4px 0 0;line-height:1.4">⚠️ Auto-Fill is not perfect — always check the fields after importing and correct anything that looks off.</p>
   </div>
 </details>
 
@@ -810,21 +878,22 @@ margin-bottom: 2px;
     <button onclick="clearRecipePhoto()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);border:none;color:#fff;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
   </div>
   <!-- Upload + Emoji row -->
-  <div style="display:flex;gap:8px;margin-bottom:8px">
+  <div style="display:flex;gap:8px;margin-bottom:8px;position:relative">
     <button onclick="triggerPhotoUpload()" style="flex:1;padding:10px;background:#242018;border:1px dashed #332d23;border-radius:10px;color:#c8b99a;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
       📷 Upload Photo
     </button>
     <input type="file" id="photo-upload-input" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
-    <details id="emoji-details" style="flex:1">
-      <summary style="cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;padding:10px;background:#242018;border:1px solid #332d23;border-radius:10px;height:100%">
-        <span id="emoji-preview" style="font-size:22px">🍅</span>
-        <span id="emoji-hint" style="font-size:12px;color:#7a6e5e">pick emoji</span>
-        <span style="margin-left:auto;font-size:12px;color:#7a6e5e">›</span>
-      </summary>
-      <div style="padding-top:8px">
+    <button type="button" onclick="toggleEmojiPicker()" style="flex:1;padding:10px;background:#242018;border:1px solid #332d23;border-radius:10px;color:#c8b99a;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px">
+      <span id="emoji-preview" style="font-size:22px">🍅</span>
+      <span id="emoji-hint" style="font-size:12px;color:#7a6e5e">pick emoji</span>
+      <span style="margin-left:auto;font-size:12px;color:#7a6e5e" id="emoji-arrow">›</span>
+    </button>
+    <!-- Hidden emoji picker panel -->
+    <div id="emoji-details" style="display:none;position:absolute;left:0;right:0;z-index:200;background:#1c1814;border:1px solid #332d23;border-radius:12px;margin-top:4px;max-height:260px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.6)">
+      <div style="padding:8px">
         <div class="emoji-picker" id="emoji-row"></div>
       </div>
-    </details>
+    </div>
   </div>
 </div>
 
@@ -956,6 +1025,16 @@ margin-bottom: 2px;
     <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">Ingredients <span style="display:flex;gap:8px;align-items:center"><span style="color:var(--muted);font-weight:400;font-size:10px">tap 🛒 to add</span><span style="cursor:pointer;font-size:14px" onclick="makeEditable(document.getElementById('d-ingredients-raw'),'ingredients',true)">✏️</span></span></div>
     <div id="d-ingredients-raw" style="display:none"></div>
     <div id="d-ingredients"></div>
+    <!-- Cutting board shown in detail view -->
+    <div id="detail-cutting-board" style="display:none;margin-top:12px">
+      <div class="cb-wood">
+        <div class="cb-handle"></div>
+        <div class="cb-surface">
+          <div id="detail-cb-items" class="cb-items"></div>
+          <div class="cb-grain"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="detail-section">
@@ -1055,6 +1134,7 @@ margin-bottom: 2px;
   <div style="padding:8px 0 0">
     <textarea id="shop-bulk-input" placeholder="e.g. need eggs, grab 2 bags of rice, pick up olive oil..." style="min-height:60px;font-size:13px;margin-bottom:6px"></textarea>
     <button class="parse-btn" onclick="bulkImportShop()">✨ Smart Import</button>
+    <p style="font-size:11px;color:var(--muted);margin:6px 0 0;line-height:1.4">⚠️ Results may not be perfect — review the list after importing.</p>
   </div>
 </details>
 
@@ -1198,6 +1278,7 @@ margin-bottom: 2px;
   <div style="padding:8px 0 0">
     <textarea id="pantry-bulk-input" placeholder="e.g. out of eggs, running low on butter, just bought pasta..." style="min-height:60px;font-size:13px;margin-bottom:6px"></textarea>
     <button class="parse-btn" onclick="bulkImportPantry()">✨ Smart Import</button>
+    <p style="font-size:11px;color:var(--muted);margin:6px 0 0;line-height:1.4">⚠️ Results may not be perfect — review your pantry after importing.</p>
   </div>
 </details>
 
@@ -1339,6 +1420,93 @@ function saveShop() {
   } catch (err) {
     console.error('saveShop failed:', err);
   }
+}
+
+// ── CUTTING BOARD ─────────────────────────────────────
+const CB_INGREDIENTS = {
+  // Proteins
+  'beef':['🥩','Beef'],'steak':['🥩','Steak'],'chicken':['🍗','Chicken'],
+  'pork':['🥓','Pork'],'bacon':['🥓','Bacon'],'ham':['🍖','Ham'],
+  'lamb':['🍖','Lamb'],'turkey':['🦃','Turkey'],'shrimp':['🍤','Shrimp'],
+  'prawn':['🍤','Prawn'],'salmon':['🐟','Salmon'],'tuna':['🐟','Tuna'],
+  'fish':['🐟','Fish'],'crab':['🦀','Crab'],'lobster':['🦞','Lobster'],
+  'egg':['🥚','Egg'],'eggs':['🥚','Eggs'],'tofu':['🧊','Tofu'],
+  'sausage':['🌭','Sausage'],
+  // Vegetables
+  'tomato':['🍅','Tomato'],'tomatillo':['🍅','Tomatillo'],
+  'tomatillos':['🍅','Tomatillos'],'onion':['🧅','Onion'],
+  'garlic':['🧄','Garlic'],'potato':['🥔','Potato'],'carrot':['🥕','Carrot'],
+  'broccoli':['🥦','Broccoli'],'lettuce':['🥬','Lettuce'],'spinach':['🥬','Spinach'],
+  'cucumber':['🥒','Cucumber'],'avocado':['🥑','Avocado'],'corn':['🌽','Corn'],
+  'pepper':['🌶️','Pepper'],'jalapeño':['🌶️','Jalapeño'],'jalapeno':['🌶️','Jalapeño'],
+  'chili':['🌶️','Chili'],'mushroom':['🍄','Mushroom'],'eggplant':['🍆','Eggplant'],
+  'zucchini':['🥒','Zucchini'],'cabbage':['🥬','Cabbage'],'kale':['🥬','Kale'],
+  'peas':['🫛','Peas'],'beans':['🫘','Beans'],'lentils':['🫘','Lentils'],
+  'chickpea':['🫘','Chickpea'],'celery':['🥦','Celery'],'asparagus':['🥦','Asparagus'],
+  // Fruits
+  'lemon':['🍋','Lemon'],'lime':['🍋','Lime'],'orange':['🍊','Orange'],
+  'apple':['🍎','Apple'],'banana':['🍌','Banana'],'mango':['🥭','Mango'],
+  'strawberry':['🍓','Berry'],'blueberry':['🫐','Blueberry'],
+  'pineapple':['🍍','Pineapple'],'coconut':['🥥','Coconut'],
+  'grape':['🍇','Grape'],'watermelon':['🍉','Melon'],'peach':['🍑','Peach'],
+  // Dairy
+  'milk':['🥛','Milk'],'butter':['🧈','Butter'],'cream':['🥛','Cream'],
+  'cheese':['🧀','Cheese'],'parmesan':['🧀','Parmesan'],'mozzarella':['🧀','Mozzarella'],
+  'yogurt':['🥛','Yogurt'],
+  // Grains
+  'flour':['🌾','Flour'],'rice':['🍚','Rice'],'pasta':['🍝','Pasta'],
+  'spaghetti':['🍝','Pasta'],'noodles':['🍜','Noodles'],'bread':['🍞','Bread'],
+  'tortilla':['🫓','Tortilla'],'oats':['🌾','Oats'],
+  // Pantry
+  'olive oil':['🫒','Olive Oil'],'oil':['🫙','Oil'],'olives':['🫒','Olives'],
+  'salt':['🧂','Salt'],'sugar':['🍬','Sugar'],'honey':['🍯','Honey'],
+  'vinegar':['🫙','Vinegar'],'soy sauce':['🫙','Soy Sauce'],
+  'broth':['🍲','Broth'],'stock':['🍲','Stock'],
+  'cumin':['🌿','Cumin'],'paprika':['🌶️','Paprika'],'cinnamon':['🌿','Cinnamon'],
+  'ginger':['🌿','Ginger'],'basil':['🌿','Basil'],'cilantro':['🌿','Cilantro'],
+  'parsley':['🌿','Parsley'],'thyme':['🌿','Thyme'],'rosemary':['🌿','Rosemary'],
+  'oregano':['🌿','Oregano'],'vanilla':['🌿','Vanilla'],
+  // Nuts
+  'almond':['🥜','Almonds'],'peanut':['🥜','Peanuts'],'walnut':['🌰','Walnuts'],
+  'cashew':['🥜','Cashews'],'sesame':['🌿','Sesame'],
+  // Other
+  'water':['💧','Water'],'wine':['🍷','Wine'],'chocolate':['🍫','Chocolate'],
+  'baking powder':['🧪','Baking Pdr'],'baking soda':['🧪','Baking Soda'],
+};
+
+function scanCuttingBoard() {
+  const text = (document.getElementById('r-ingredients')?.value || '').toLowerCase();
+  const board = document.getElementById('cutting-board');
+  const container = document.getElementById('cb-items');
+  if (!board || !container) return;
+
+  if (!text.trim()) { board.style.display = 'none'; return; }
+
+  // Sort by length descending so multi-word matches take priority
+  const sorted = Object.entries(CB_INGREDIENTS).sort((a, b) => b[0].length - a[0].length);
+  const found = new Map();
+  for (const [keyword, [emoji, label]] of sorted) {
+    if (text.includes(keyword)) {
+      const key = emoji + label;
+      if (!found.has(key)) found.set(key, { emoji, label });
+    }
+  }
+
+  if (found.size === 0) { board.style.display = 'none'; return; }
+
+  board.style.display = 'block';
+
+  // Only re-render if ingredients changed
+  const newKey = [...found.keys()].join(',');
+  if (container.dataset.lastKey === newKey) return;
+  container.dataset.lastKey = newKey;
+
+  container.innerHTML = [...found.values()].map(({ emoji, label }) =>
+    `<div class="cb-item">
+      <div class="cb-item-emoji">${emoji}</div>
+      <div class="cb-item-label">${label}</div>
+    </div>`
+  ).join('');
 }
 
 // ── PHOTO UPLOAD ──────────────────────────────────────
@@ -1619,6 +1787,22 @@ document.addEventListener('click', function(e) {
 });
 
 // ── EMOJI PICKER ──────────────────────────────────────
+function toggleEmojiPicker() {
+  const panel = document.getElementById('emoji-details');
+  const arrow = document.getElementById('emoji-arrow');
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (arrow) arrow.textContent = isOpen ? '›' : '‹';
+}
+
+function closeEmojiPicker() {
+  const panel = document.getElementById('emoji-details');
+  const arrow = document.getElementById('emoji-arrow');
+  if (panel) panel.style.display = 'none';
+  if (arrow) arrow.textContent = '›';
+}
+
 function buildEmojiPicker() {
   const container = document.getElementById('emoji-row');
   container.innerHTML = '';
@@ -1665,11 +1849,8 @@ function buildEmojiPicker() {
         if (preview) preview.textContent = e;
         const hint = document.getElementById('emoji-hint');
         if (hint) hint.textContent = 'tap to change';
-        // Close the details after short delay
-        setTimeout(() => {
-          const det = document.getElementById('emoji-details');
-          if (det) det.removeAttribute('open');
-        }, 300);
+        // Close the picker after short delay
+        setTimeout(() => closeEmojiPicker(), 300);
         // Keyboard popup
         document.querySelectorAll('.nav-key-popup').forEach(p => p.remove());
         const popup = document.createElement('div');
@@ -2066,13 +2247,71 @@ function setUnit(unit) {
 
 // ── SCALING ───────────────────────────────────────────
 function scaleIngredient(line, ratio) {
-  let result = line;
-  if (ratio !== 1) {
-    result = result.replace(/(\d+\.?\d*)/g, (m) => {
-      const s = parseFloat(m) * ratio;
-      return s % 1 === 0 ? s : parseFloat(s.toFixed(1));
-    });
+  if (ratio === 1 && currentUnit !== 'metric') return line;
+
+  // Convert a decimal to a nice fraction string
+  function toFraction(n) {
+    if (n === 0) return '0';
+    const whole = Math.floor(n);
+    const dec = n - whole;
+    const fracs = [[1,4],[1,3],[1,2],[2,3],[3,4],[1,8],[3,8],[5,8],[7,8]];
+    let best = null, bestDiff = 0.09;
+    for (const [num, den] of fracs) {
+      const diff = Math.abs(dec - num/den);
+      if (diff < bestDiff) { bestDiff = diff; best = [num, den]; }
+    }
+    if (!best) {
+      // Just show decimal rounded to 1 place
+      const rounded = Math.round(n * 10) / 10;
+      return whole > 0 && dec > 0.05 ? rounded.toString() : whole.toString();
+    }
+    if (whole === 0) return `${best[0]}/${best[1]}`;
+    return `${whole} ${best[0]}/${best[1]}`;
   }
+
+  // Parse number from string — handles fractions like 1/4, mixed like 1 1/2
+  function parseNum(s) {
+    // Mixed number: "1 1/2"
+    const mixed = s.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+    if (mixed) return parseInt(mixed[1]) + parseInt(mixed[2])/parseInt(mixed[3]);
+    // Simple fraction: "1/4"
+    const frac = s.match(/^(\d+)\/(\d+)$/);
+    if (frac) return parseInt(frac[1])/parseInt(frac[2]);
+    // Decimal or integer
+    return parseFloat(s);
+  }
+
+  let result = line;
+
+  // If line has NO leading number, it's a countable item like "whole tomato" — infer qty of 1
+  const hasLeadingNumber = /^\s*(\d+\s+\d+\/\d+|\d+\/\d+|\d+\.?\d*)/.test(line);
+  const isSeasoning = /to taste|as needed|as required|pinch of|dash of/i.test(line);
+  if (!hasLeadingNumber) {
+    if (isSeasoning) return line; // never scale "salt to taste" etc
+    const scaled = 1 * ratio;
+    const scaledStr = scaled % 1 === 0 ? scaled.toString() : toFraction(scaled);
+    result = `${scaledStr} ${line.trim()}`;
+    if (currentUnit === 'metric') result = convertToMetric(result);
+    return result;
+  }
+
+  // Replace numbers in order of complexity (mixed > fraction > decimal > integer)
+  // Pattern: optional mixed number "1 1/2", fraction "1/4", or decimal/int
+  result = result.replace(/(\d+\s+\d+\/\d+|\d+\/\d+|\d+\.?\d*)/g, (m) => {
+    const val = parseNum(m);
+    if (isNaN(val)) return m;
+    const scaled = val * ratio;
+    // If original was a fraction or mixed number, return nice fraction
+    if (m.includes('/') || m.includes(' ')) {
+      return toFraction(scaled);
+    }
+    // Integer or decimal
+    if (scaled % 1 === 0) return scaled.toString();
+    // Check if it rounds nicely to a fraction
+    const frac = toFraction(scaled);
+    return frac;
+  });
+
   if (currentUnit === 'metric') result = convertToMetric(result);
   return result;
 }
@@ -2116,6 +2355,7 @@ function toggleStep(i) {
 }
 
 function changeServings(delta) {
+  if (!currentRecipe) return;
   currentServings = Math.max(1, currentServings + delta);
   document.getElementById('d-servings').textContent = currentServings;
   renderIngredients();
@@ -2225,7 +2465,8 @@ function showAdd() {
   document.getElementById('save-btn').textContent = 'Save Recipe';
   document.getElementById('delete-btn-container').innerHTML = '';
   clearRecipePhoto();
-  buildEmojiPicker(); buildAutoTags();
+  buildEmojiPicker(); buildAutoTags(); closeEmojiPicker();
+  scanCuttingBoard();
   setView('add-view'); setNav('nav-add');
 }
 
@@ -2264,6 +2505,32 @@ function showDetail(id) {
 
   const timers = detectTimers(currentRecipe.steps || '');
   renderSmartTimers(timers);
+
+  // Populate detail cutting board
+  const detailBoard = document.getElementById('detail-cutting-board');
+  const detailItems = document.getElementById('detail-cb-items');
+  if (detailBoard && detailItems && currentRecipe.ingredients) {
+    const text = currentRecipe.ingredients.toLowerCase();
+    const sorted = Object.entries(CB_INGREDIENTS).sort((a, b) => b[0].length - a[0].length);
+    const found = new Map();
+    for (const [keyword, [emoji, label]] of sorted) {
+      if (text.includes(keyword)) {
+        const key = emoji + label;
+        if (!found.has(key)) found.set(key, { emoji, label });
+      }
+    }
+    if (found.size > 0) {
+      detailBoard.style.display = 'block';
+      detailItems.innerHTML = [...found.values()].map(({ emoji, label }) =>
+        `<div class="cb-item">
+          <div class="cb-item-emoji">${emoji}</div>
+          <div class="cb-item-label">${label}</div>
+        </div>`
+      ).join('');
+    } else {
+      detailBoard.style.display = 'none';
+    }
+  }
 
   const notes = currentRecipe.notes;
   document.getElementById('d-notes-section').style.display = notes ? 'block' : 'none';
@@ -2805,6 +3072,7 @@ function editCurrent() {
     `<button class="btn btn-danger" onclick="deleteRecipe(editingId)">🗑 Delete Recipe</button>`;
   loadPhotoIntoForm(currentRecipe);
   buildEmojiPicker(); buildAutoTags();
+  scanCuttingBoard();
   setView('add-view'); setNav('nav-add');
 }
 
