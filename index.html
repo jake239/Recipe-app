@@ -1024,7 +1024,13 @@ margin-bottom: 2px;
   </div>
 
   <div class="detail-section">
-    <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">Ingredients <span style="display:flex;gap:8px;align-items:center"><span style="color:var(--muted);font-weight:400;font-size:10px">tap 🛒 to add</span><span style="cursor:pointer;font-size:14px" onclick="makeEditable(document.getElementById('d-ingredients-raw'),'ingredients',true)">✏️</span></span></div>
+    <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <span>Ingredients</span>
+      <span style="display:flex;gap:10px;align-items:center">
+        <span style="color:var(--muted);font-weight:400;font-size:11px;text-transform:none;letter-spacing:0">tap 🛒 to add to list</span>
+        <button onclick="makeEditable(document.getElementById('d-ingredients-raw'),'ingredients',true)" style="background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;color:var(--accent)" aria-label="Edit ingredients">✏️</button>
+      </span>
+    </div>
     <div id="d-ingredients-raw" style="display:none"></div>
     <div id="d-ingredients"></div>
     <!-- Cutting board shown in detail view -->
@@ -1040,7 +1046,13 @@ margin-bottom: 2px;
   </div>
 
   <div class="detail-section">
-    <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">Steps <span style="display:flex;gap:8px;align-items:center"><span style="color:var(--muted);font-weight:400;font-size:10px">tap to mark done</span><span style="cursor:pointer;font-size:14px" onclick="makeEditable(document.getElementById('d-steps-raw'),'steps',true)">✏️</span></span></div>
+    <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <span>Steps</span>
+      <span style="display:flex;gap:10px;align-items:center">
+        <span style="color:var(--muted);font-weight:400;font-size:11px;text-transform:none;letter-spacing:0">tap to mark done</span>
+        <button onclick="makeEditable(document.getElementById('d-steps-raw'),'steps',true)" style="background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;color:var(--accent)" aria-label="Edit steps">✏️</button>
+      </span>
+    </div>
     <div id="d-steps-raw" style="display:none"></div>
     <div id="d-steps"></div>
   </div>
