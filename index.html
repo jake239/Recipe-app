@@ -1463,7 +1463,7 @@ const CB_INGREDIENTS = {
   'olive oil':['🫒','Olive Oil'],'oil':['🫙','Oil'],'olives':['🫒','Olives'],
   'salt':['🧂','Salt'],'sugar':['🍬','Sugar'],'honey':['🍯','Honey'],
   'vinegar':['🫙','Vinegar'],'soy sauce':['🫙','Soy Sauce'],
-  'broth':['🍲','Broth'],'stock':['🍲','Stock'],
+  'broth':['🫙','Broth'],'stock':['🫙','Stock'],
   'cumin':['🌿','Cumin'],'paprika':['🌶️','Paprika'],'cinnamon':['🌿','Cinnamon'],
   'ginger':['🌿','Ginger'],'basil':['🌿','Basil'],'cilantro':['🌿','Cilantro'],
   'parsley':['🌿','Parsley'],'thyme':['🌿','Thyme'],'rosemary':['🌿','Rosemary'],
@@ -1478,9 +1478,17 @@ const CB_INGREDIENTS = {
   'condensed milk':['🥛','Cond Milk'],'evaporated milk':['🥛','Evap Milk'],
   'panko':['🌾','Panko'],'breadcrumb':['🌾','Breadcrumb'],
   'tortilla chip':['🌮','Tort Chips'],'salsa':['🍅','Salsa'],
-  'bouillon':['🍲','Bouillon'],'worcestershire':['🫙','Worchester'],
+  'chicken bouillon':['🍲','Chkn Bouillon'],'beef bouillon':['🍲','Beef Bouillon'],
+  'vegetable bouillon':['🍲','Veg Bouillon'],'chicken broth':['🫙','Chkn Broth'],
+  'beef broth':['🫙','Beef Broth'],'chicken stock':['🫙','Chkn Stock'],
+  'beef stock':['🫙','Beef Stock'],
   'cornstarch':['🌾','Cornstarch'],'cayenne':['🌶️','Cayenne'],
   'baking powder':['🧪','Baking Pwd'],'baking soda':['🧪','Baking Soda'],
+  // Liquids
+  'water':['🫗','Water'],'milk':['🥛','Milk'],'cream':['🥛','Cream'],
+  'wine':['🍷','Wine'],'beer':['🍺','Beer'],'broth':['🫙','Broth'],
+  'stock':['🫙','Stock'],'juice':['🧃','Juice'],'coffee':['☕','Coffee'],
+  'tea':['🍵','Tea'],'coconut milk':['🥥','Coconut Milk'],
 };
 
 function scanCuttingBoard() {
@@ -1494,11 +1502,23 @@ function scanCuttingBoard() {
   // Sort by length descending so multi-word matches take priority
   const sorted = Object.entries(CB_INGREDIENTS).sort((a, b) => b[0].length - a[0].length);
   const found = new Map();
+  const matchedRanges = [];
+
   for (const [keyword, [emoji, label]] of sorted) {
-    // Use word boundary matching to avoid "corn" matching inside "cornstarch"
     const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`\\b${escaped}\\b`, 'i');
-    if (regex.test(text)) {
+    const regex = new RegExp(`\\b${escaped}\\b`, 'gi');
+    let match;
+    let anyMatch = false;
+    while ((match = regex.exec(text)) !== null) {
+      const start = match.index;
+      const end = start + keyword.length;
+      const overlaps = matchedRanges.some(([s, e]) => start < e && end > s);
+      if (!overlaps) {
+        anyMatch = true;
+        matchedRanges.push([start, end]);
+      }
+    }
+    if (anyMatch) {
       const key = emoji + label;
       if (!found.has(key)) found.set(key, { emoji, label });
     }
@@ -1513,7 +1533,22 @@ function scanCuttingBoard() {
   if (container.dataset.lastKey === newKey) return;
   container.dataset.lastKey = newKey;
 
-  container.innerHTML = [...found.values()].map(({ emoji, label }) =>
+  // Sort: proteins → veg/fruit → dairy → grains → spices/pantry
+  const catOrder = {
+    '🥩':0,'🍗':0,'🥓':0,'🍖':0,'🐟':0,'🦀':0,'🦞':0,'🍤':0,'🌭':0,
+    '🥚':1,'🧊':1,
+    '🍅':2,'🧅':2,'🧄':2,'🥔':2,'🥕':2,'🥦':2,'🥬':2,'🥒':2,'🥑':2,
+    '🌽':2,'🍆':2,'🫛':2,'🫘':2,'🍋':3,'🍊':3,'🍎':3,'🍌':3,'🥭':3,
+    '🫐':3,'🍍':3,'🥥':3,'🍑':3,'🍒':3,'🍓':3,'🍇':3,'🍉':3,
+    '🧀':4,'🥛':4,'🧈':4,
+    '🌾':5,'🍞':5,'🍚':5,'🍝':5,'🍜':5,'🫓':5,
+    '🧂':6,'🌿':6,'🌶️':6,'🍯':6,'🫙':6,'🍲':6,'🧪':6,'🫒':6,
+    '🫗':7,'🍷':7,'🍺':7,'🧃':7,'☕':7,'🍵':7,'🍫':7,
+  };
+  const getCat = (e) => catOrder[e] ?? 8;
+  const items = [...found.values()].sort((a, b) => getCat(a.emoji) - getCat(b.emoji));
+
+  container.innerHTML = items.map(({ emoji, label }) =>
     `<div class="cb-item">
       <div class="cb-item-emoji">${emoji}</div>
       <div class="cb-item-label">${label}</div>
@@ -2557,17 +2592,36 @@ function showDetail(id) {
     const text = currentRecipe.ingredients.toLowerCase();
     const sorted = Object.entries(CB_INGREDIENTS).sort((a, b) => b[0].length - a[0].length);
     const found = new Map();
+    const matchedRanges = [];
     for (const [keyword, [emoji, label]] of sorted) {
       const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(`\\b${escaped}\\b`, 'i');
-      if (regex.test(text)) {
+      const regex = new RegExp(`\\b${escaped}\\b`, 'gi');
+      let match;
+      let anyMatch = false;
+      while ((match = regex.exec(text)) !== null) {
+        const start = match.index;
+        const end = start + keyword.length;
+        const overlaps = matchedRanges.some(([s, e]) => start < e && end > s);
+        if (!overlaps) { anyMatch = true; matchedRanges.push([start, end]); }
+      }
+      if (anyMatch) {
         const key = emoji + label;
         if (!found.has(key)) found.set(key, { emoji, label });
       }
     }
     if (found.size > 0) {
       detailBoard.style.display = 'block';
-      detailItems.innerHTML = [...found.values()].map(({ emoji, label }) =>
+      const catOrder = {
+        '🥩':0,'🍗':0,'🥓':0,'🍖':0,'🐟':0,'🦀':0,'🦞':0,'🍤':0,'🌭':0,
+        '🥚':1,'🧊':1,'🍅':2,'🧅':2,'🧄':2,'🥔':2,'🥕':2,'🥦':2,'🥬':2,
+        '🥒':2,'🥑':2,'🌽':2,'🍆':2,'🫛':2,'🫘':2,'🍋':3,'🍊':3,'🍎':3,
+        '🍌':3,'🥭':3,'🫐':3,'🍍':3,'🥥':3,'🧀':4,'🥛':4,'🧈':4,
+        '🌾':5,'🍞':5,'🍚':5,'🍝':5,'🍜':5,'🫓':5,
+        '🧂':6,'🌿':6,'🌶️':6,'🍯':6,'🫙':6,'🍲':6,'🧪':6,'🫒':6,
+      };
+      const getCat = (e) => catOrder[e] ?? 8;
+      const items = [...found.values()].sort((a,b) => getCat(a.emoji) - getCat(b.emoji));
+      detailItems.innerHTML = items.map(({ emoji, label }) =>
         `<div class="cb-item">
           <div class="cb-item-emoji">${emoji}</div>
           <div class="cb-item-label">${label}</div>
