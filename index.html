@@ -1425,6 +1425,48 @@ function saveShop() {
   }
 }
 
+// ── INGREDIENT SORTER ────────────────────────────────
+// Same category order as cutting board so list and board always match
+function sortIngredients(lines) {
+  // Category priority per keyword — lower = appears first
+  const CAT_RULES = [
+    // 0 — Proteins / Meat (check first — most specific)
+    [0, /\b(beef|steak|chicken wing|chicken breast|chicken thigh|pork|bacon|ham|lamb|turkey|shrimp|prawn|salmon|tuna|fish fillet|crab|lobster|sausage|ground meat|flap meat|loin|drum|wing)\b/i],
+    // 1 — Whole proteins (less specific)
+    [1, /\b(chicken|fish|meat|egg|tofu|seafood)\b/i],
+    // 2 — Vegetables (whole, fresh)
+    [2, /\b(tomatillo|jalape|onion|potato|carrot|broccoli|lettuce|spinach|cucumber|avocado|corn(?!starch)|mushroom|eggplant|zucchini|cabbage|kale|peas|bean(?!s sauce)|lentil|chickpea|celery|asparagus|scallion|leek|beet|squash|yam|arugula|pepper|chile de|chile)\b/i],
+    // 3 — Tomatoes (separate since used a lot)
+    [3, /\b(tomato(?! paste| sauce)|roma)\b/i],
+    // 4 — Fruits & citrus
+    [4, /\b(lemon|lime(?! zest| juice| oil)|orange|apple|banana|mango|strawberry|blueberry|pineapple|coconut|grape|watermelon|peach|cherry|berry)\b/i],
+    // 4.5 — Lime zest / juice (keep near fruit)
+    [4, /\b(lime zest|lime juice|lemon juice|lemon zest)\b/i],
+    // 5 — Dairy
+    [5, /\b(milk|butter(?! seasoning)|cream(?! of)|cheese|parmesan|mozzarella|yogurt|cheddar|ricotta|feta)\b/i],
+    // 6 — Grains / Starches
+    [6, /\b(flour|rice|pasta|spaghetti|noodle|bread|tortilla|oat|cornstarch|panko|breadcrumb)\b/i],
+    // 7 — Fresh herbs
+    [7, /\b(cilantro|basil|parsley|thyme|rosemary|oregano|mint|chive|dill|bay leaf)\b/i],
+    // 8 — Dry spices & seasonings
+    [8, /\b(cumin|paprika|cinnamon|ginger|cayenne|turmeric|curry|garlic powder|onion powder|chili powder|allspice|clove|nutmeg|seasoning|spice|herb|bouillon)\b/i],
+    // 9 — Oils, sauces, liquids, pantry
+    [9, /\b(oil|vinegar|soy sauce|salsa|honey|sugar|maple|tomato paste|tomato sauce|ketchup|mustard|mayo|worcestershire|hot sauce|broth|stock|water|wine|beer|juice|coffee|tea|garlic salt|garlic cloves|garlic)\b/i],
+    // 10 — Salt & Pepper always last
+    [10, /\b(salt|pepper)\b/i],
+  ];
+
+  function getCategory(line) {
+    const lower = line.toLowerCase();
+    for (const [cat, regex] of CAT_RULES) {
+      if (regex.test(lower)) return cat;
+    }
+    return 5; // default: pantry/misc
+  }
+
+  return [...lines].sort((a, b) => getCategory(a) - getCategory(b));
+}
+
 // ── CUTTING BOARD ─────────────────────────────────────
 const CB_INGREDIENTS = {
   // Proteins
@@ -2217,7 +2259,7 @@ function autoFill() {
     buildAutoTags();
   }
   
-  if (ingredients.length) document.getElementById('r-ingredients').value = ingredients.join('\n');
+  if (ingredients.length) document.getElementById('r-ingredients').value = sortIngredients(ingredients).join('\n');
   if (steps.length) document.getElementById('r-steps').value = steps.join('\n');
   
   document.getElementById('paste-raw').value = '';
