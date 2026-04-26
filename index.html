@@ -1436,6 +1436,8 @@ function saveShop() {
 function sortIngredients(lines) {
   // Category priority per keyword — lower = appears first
   const CAT_RULES = [
+    // -1 — "Salt & Pepper to taste" checked FIRST before vegetable "pepper" can match
+    [10, /salt\s*(&|and)\s*pepper|salt\s+to\s+taste/i],
     // 0 — Proteins / Meat (check first — most specific)
     [0, /\b(beef|steak|chicken wing|chicken breast|chicken thigh|pork|bacon|ham|lamb|turkey|shrimp|prawn|salmon|tuna|fish fillet|crab|lobster|sausage|ground meat|flap meat|loin|drum|wing)\b/i],
     // 1 — Whole proteins (less specific)
@@ -1457,9 +1459,9 @@ function sortIngredients(lines) {
     // 8 — Dry spices & seasonings
     [8, /\b(cumin|paprika|cinnamon|ginger|cayenne|turmeric|curry|garlic powder|onion powder|chili powder|allspice|clove|nutmeg|seasoning|spice|herb|bouillon)\b/i],
     // 9 — Oils, sauces, liquids, pantry
-    [9, /\b(oil|vinegar|soy sauce|salsa|honey|sugar|maple|tomato paste|tomato sauce|ketchup|mustard|mayo|worcestershire|hot sauce|broth|stock|water|wine|beer|juice|coffee|tea|garlic salt|garlic cloves|garlic)\b/i],
-    // 10 — Salt & Pepper always last
-    [10, /\b(salt|pepper)\b/i],
+    [9, /\b(oil|vinegar|soy sauce|honey|sugar|maple|tomato paste|tomato sauce|ketchup|mustard|mayo|worcestershire|hot sauce|broth|stock|water|wine|beer|juice|coffee|tea|garlic salt|garlic cloves|garlic)\b/i],
+    // 10 — Salt & Pepper standalone always last
+    [10, /\bsalt\b|\bpepper\b/i],
   ];
 
   function getCategory(line) {
@@ -1526,7 +1528,6 @@ const CB_INGREDIENTS = {
   'cream cheese':['🧀','Crm Cheese'],'heavy cream':['🥛','Heavy Crm'],
   'condensed milk':['🥛','Cond Milk'],'evaporated milk':['🥛','Evap Milk'],
   'panko':['🌾','Panko'],'breadcrumb':['🌾','Breadcrumb'],
-  'tortilla chip':['🌮','Tort Chips'],'salsa':['🍅','Salsa'],
   'chicken bouillon':['🍲','Chkn Bouillon'],'beef bouillon':['🍲','Beef Bouillon'],
   'vegetable bouillon':['🍲','Veg Bouillon'],'chicken broth':['🫙','Chkn Broth'],
   'beef broth':['🫙','Beef Broth'],'chicken stock':['🫙','Chkn Stock'],
@@ -1568,7 +1569,7 @@ function scanCuttingBoard() {
       }
     }
     if (anyMatch) {
-      const key = emoji + label;
+      const key = emoji; // dedup by emoji only - prevents duplicate icons
       if (!found.has(key)) found.set(key, { emoji, label });
     }
   }
@@ -2428,7 +2429,7 @@ function scaleIngredient(line, ratio) {
     // Don't scale percentages
     if (/^%/.test(after)) return m;
     // Don't scale time ranges like "30-35 minutes"
-    if (/^-\d|\s*(minute|min|hour|hr|second|sec)/i.test(after)) return m;
+    if (/^-\d|\s*\b(minute|min|hour|hr|second|sec)\b/i.test(after)) return m;
 
     const val = parseNum(m);
     if (isNaN(val)) return m;
@@ -2654,7 +2655,7 @@ function showDetail(id) {
         if (!overlaps) { anyMatch = true; matchedRanges.push([start, end]); }
       }
       if (anyMatch) {
-        const key = emoji + label;
+        const key = emoji; // dedup by emoji only - prevents duplicate icons
         if (!found.has(key)) found.set(key, { emoji, label });
       }
     }
@@ -3567,7 +3568,7 @@ function deletePantryItem(id) {
 function filterPantry(f, el) {
   pantryFilter = f;
   document.querySelectorAll('.pantry-filter').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
+  if (el) el.classList.add('active');
   renderPantryList();
 }
 
