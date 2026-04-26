@@ -1477,127 +1477,172 @@ function sortIngredients(lines) {
 
 // ── CUTTING BOARD ─────────────────────────────────────
 const CB_INGREDIENTS = {
-  // Proteins
-  'beef':['🥩','Beef'],'steak':['🥩','Steak'],'chicken':['🍗','Chicken'],
-  'pork':['🥓','Pork'],'bacon':['🥓','Bacon'],'ham':['🍖','Ham'],
-  'lamb':['🍖','Lamb'],'turkey':['🦃','Turkey'],'shrimp':['🍤','Shrimp'],
-  'prawn':['🍤','Prawn'],'salmon':['🐟','Salmon'],'tuna':['🐟','Tuna'],
-  'fish':['🐟','Fish'],'crab':['🦀','Crab'],'lobster':['🦞','Lobster'],
-  'egg':['🥚','Egg'],'eggs':['🥚','Eggs'],'tofu':['🧊','Tofu'],
-  'sausage':['🌭','Sausage'],
-  // Vegetables
-  'tomato':['🍅','Tomato'],'tomatillo':['🍅','Tomatillo'],
-  'tomatillos':['🍅','Tomatillos'],'onion':['🧅','Onion'],
-  'garlic':['🧄','Garlic'],'potato':['🥔','Potato'],'carrot':['🥕','Carrot'],
-  'broccoli':['🥦','Broccoli'],'lettuce':['🥬','Lettuce'],'spinach':['🥬','Spinach'],
-  'cucumber':['🥒','Cucumber'],'avocado':['🥑','Avocado'],'corn':['🌽','Corn'],
-  'pepper':['🌶️','Pepper'],'jalapeño':['🌶️','Jalapeño'],'jalapeno':['🌶️','Jalapeño'],
-  'chili':['🌶️','Chili'],'mushroom':['🍄','Mushroom'],'eggplant':['🍆','Eggplant'],
-  'zucchini':['🥒','Zucchini'],'cabbage':['🥬','Cabbage'],'kale':['🥬','Kale'],
-  'peas':['🫛','Peas'],'beans':['🫘','Beans'],'lentils':['🫘','Lentils'],
-  'chickpea':['🫘','Chickpea'],'celery':['🥦','Celery'],'asparagus':['🥦','Asparagus'],
-  // Fruits
-  'lemon':['🍋','Lemon'],'lime':['🍋','Lime'],'orange':['🍊','Orange'],
-  'apple':['🍎','Apple'],'banana':['🍌','Banana'],'mango':['🥭','Mango'],
-  'strawberry':['🍓','Berry'],'blueberry':['🫐','Blueberry'],
-  'pineapple':['🍍','Pineapple'],'coconut':['🥥','Coconut'],
-  'grape':['🍇','Grape'],'watermelon':['🍉','Melon'],'peach':['🍑','Peach'],
-  // Dairy
-  'milk':['🥛','Milk'],'butter':['🧈','Butter'],'cream':['🥛','Cream'],
-  'cheese':['🧀','Cheese'],'parmesan':['🧀','Parmesan'],'mozzarella':['🧀','Mozzarella'],
-  'yogurt':['🥛','Yogurt'],
-  // Grains
-  'flour':['🌾','Flour'],'rice':['🍚','Rice'],'pasta':['🍝','Pasta'],
-  'spaghetti':['🍝','Pasta'],'noodles':['🍜','Noodles'],'bread':['🍞','Bread'],
-  'tortilla':['🫓','Tortilla'],'oats':['🌾','Oats'],
-  // Pantry
-  'olive oil':['🫒','Olive Oil'],'oil':['🫙','Oil'],'olives':['🫒','Olives'],
-  'salt':['🧂','Salt'],'sugar':['🍬','Sugar'],'honey':['🍯','Honey'],
-  'vinegar':['🫙','Vinegar'],'soy sauce':['🫙','Soy Sauce'],
-  'broth':['🫙','Broth'],'stock':['🫙','Stock'],
-  'cumin':['🌿','Cumin'],'paprika':['🌶️','Paprika'],'cinnamon':['🌿','Cinnamon'],
-  'ginger':['🌿','Ginger'],'basil':['🌿','Basil'],'cilantro':['🌿','Cilantro'],
-  'parsley':['🌿','Parsley'],'thyme':['🌿','Thyme'],'rosemary':['🌿','Rosemary'],
-  'oregano':['🌿','Oregano'],'vanilla':['🌿','Vanilla'],
-  // Nuts
-  'almond':['🥜','Almonds'],'peanut':['🥜','Peanuts'],'walnut':['🌰','Walnuts'],
-  'cashew':['🥜','Cashews'],'sesame':['🌿','Sesame'],
-  // Other
-  'smoked paprika':['🌶️','Smk Paprika'],'lime zest':['🍋','Lime Zest'],
-  'chili oil':['🌶️','Chili Oil'],'sour cream':['🥛','Sour Cream'],
+  // ── MULTI-WORD (checked first due to sort by length) ──
+  'chicken bouillon':['🍲','Chkn Bouillon'],'beef bouillon':['🍲','Beef Bouillon'],
+  'vegetable bouillon':['🍲','Veg Bouillon'],
+  'chicken broth':['🫙','Chkn Broth'],'beef broth':['🫙','Beef Broth'],
+  'chicken stock':['🫙','Chkn Stock'],'beef stock':['🫙','Beef Stock'],
+  'coconut milk':['🥥','Coconut Milk'],'sour cream':['🥛','Sour Cream'],
   'cream cheese':['🧀','Crm Cheese'],'heavy cream':['🥛','Heavy Crm'],
   'condensed milk':['🥛','Cond Milk'],'evaporated milk':['🥛','Evap Milk'],
-  'panko':['🌾','Panko'],'breadcrumb':['🌾','Breadcrumb'],
-  'chicken bouillon':['🍲','Chkn Bouillon'],'beef bouillon':['🍲','Beef Bouillon'],
-  'vegetable bouillon':['🍲','Veg Bouillon'],'chicken broth':['🫙','Chkn Broth'],
-  'beef broth':['🫙','Beef Broth'],'chicken stock':['🫙','Chkn Stock'],
-  'beef stock':['🫙','Beef Stock'],
-  'cornstarch':['🌾','Cornstarch'],'cayenne':['🌶️','Cayenne'],
+  'smoked paprika':['🌶️','Smk Paprika'],'chili oil':['🌶️','Chili Oil'],
+  'lime zest':['🍋','Lime Zest'],'lemon zest':['🍋','Lemon Zest'],
+  'lime juice':['🍋','Lime Juice'],'lemon juice':['🍋','Lemon Juice'],
+  'olive oil':['🫒','Olive Oil'],'soy sauce':['🫙','Soy Sauce'],
   'baking powder':['🧪','Baking Pwd'],'baking soda':['🧪','Baking Soda'],
-  // Liquids
-  'water':['🫗','Water'],'milk':['🥛','Milk'],'cream':['🥛','Cream'],
-  'wine':['🍷','Wine'],'beer':['🍺','Beer'],'broth':['🫙','Broth'],
-  'stock':['🫙','Stock'],'juice':['🧃','Juice'],'coffee':['☕','Coffee'],
-  'tea':['🍵','Tea'],'coconut milk':['🥥','Coconut Milk'],
+  'bread crumb':['🌾','Breadcrumb'],'breadcrumb':['🌾','Breadcrumb'],
+  'fish sauce':['🫙','Fish Sauce'],'hot sauce':['🌶️','Hot Sauce'],
+  'tomato paste':['🍅','Tom Paste'],'tomato sauce':['🍅','Tom Sauce'],
+
+  // ── PROTEINS ──────────────────────────────────────────
+  'beef':['🥩','Beef'],'steak':['🥩','Steak'],'brisket':['🥩','Brisket'],
+  'ground beef':['🥩','Grnd Beef'],'flap meat':['🥩','Flap Meat'],
+  'chicken':['🍗','Chicken'],'turkey':['🦃','Turkey'],
+  'pork':['🥓','Pork'],'bacon':['🥓','Bacon'],'ham':['🍖','Ham'],
+  'lamb':['🍖','Lamb'],'veal':['🍖','Veal'],
+  'shrimp':['🍤','Shrimp'],'prawn':['🍤','Prawn'],
+  'salmon':['🐟','Salmon'],'tuna':['🐟','Tuna'],'fish':['🐟','Fish'],
+  'crab':['🦀','Crab'],'lobster':['🦞','Lobster'],'scallop':['🐚','Scallop'],
+  'egg':['🥚','Egg'],'eggs':['🥚','Eggs'],
+  'tofu':['🧊','Tofu'],'sausage':['🌭','Sausage'],
+
+  // ── VEGETABLES ───────────────────────────────────────
+  'tomatillos':['🍅','Tomatillos'],'tomatillo':['🍅','Tomatillo'],
+  'tomatoes':['🍅','Tomatoes'],'tomato':['🍅','Tomato'],
+  'jalapenos':['🌶️','Jalapeños'],'jalapeno':['🌶️','Jalapeño'],
+  'chiles':['🌶️','Chiles'],'chile':['🌶️','Chile'],
+  'peppers':['🌶️','Peppers'],'pepper':['🌶️','Pepper'],
+  'onions':['🧅','Onions'],'onion':['🧅','Onion'],
+  'shallot':['🧅','Shallot'],
+  'garlic':['🧄','Garlic'],
+  'potatoes':['🥔','Potatoes'],'potato':['🥔','Potato'],
+  'carrots':['🥕','Carrots'],'carrot':['🥕','Carrot'],
+  'broccoli':['🥦','Broccoli'],'celery':['🥦','Celery'],
+  'asparagus':['🥦','Asparagus'],
+  'lettuce':['🥬','Lettuce'],'spinach':['🥬','Spinach'],
+  'cabbage':['🥬','Cabbage'],'kale':['🥬','Kale'],
+  'cucumbers':['🥒','Cucumbers'],'cucumber':['🥒','Cucumber'],
+  'zucchini':['🥒','Zucchini'],
+  'avocado':['🥑','Avocado'],'corn':['🌽','Corn'],
+  'mushrooms':['🍄','Mushrooms'],'mushroom':['🍄','Mushroom'],
+  'eggplant':['🍆','Eggplant'],
+  'peas':['🫛','Peas'],'beans':['🫘','Beans'],
+  'lentils':['🫘','Lentils'],'chickpea':['🫘','Chickpea'],
+
+  // ── FRUITS ───────────────────────────────────────────
+  'lemon':['🍋','Lemon'],'lime':['🍋','Lime'],
+  'orange':['🍊','Orange'],'apple':['🍎','Apple'],
+  'banana':['🍌','Banana'],'mango':['🥭','Mango'],
+  'strawberry':['🍓','Strawberry'],'blueberry':['🫐','Blueberry'],
+  'pineapple':['🍍','Pineapple'],'coconut':['🥥','Coconut'],
+  'grape':['🍇','Grape'],'watermelon':['🍉','Watermelon'],
+  'peach':['🍑','Peach'],'cherry':['🍒','Cherry'],
+
+  // ── DAIRY ────────────────────────────────────────────
+  'milk':['🥛','Milk'],'butter':['🧈','Butter'],
+  'cream':['🥛','Cream'],'yogurt':['🥛','Yogurt'],
+  'cheese':['🧀','Cheese'],'parmesan':['🧀','Parmesan'],
+  'mozzarella':['🧀','Mozzarella'],'cheddar':['🧀','Cheddar'],
+  'feta':['🧀','Feta'],'ricotta':['🧀','Ricotta'],
+
+  // ── GRAINS / STARCHES ────────────────────────────────
+  'flour':['🌾','Flour'],'cornstarch':['🌾','Cornstarch'],
+  'panko':['🌾','Panko'],'oats':['🌾','Oats'],
+  'rice':['🍚','Rice'],'pasta':['🍝','Pasta'],
+  'spaghetti':['🍝','Spaghetti'],'noodles':['🍜','Noodles'],
+  'bread':['🍞','Bread'],'tortillas':['🫓','Tortillas'],'tortilla':['🫓','Tortilla'],
+
+  // ── FRESH HERBS ──────────────────────────────────────
+  'cilantro':['🌿','Cilantro'],'basil':['🌿','Basil'],
+  'parsley':['🌿','Parsley'],'thyme':['🌿','Thyme'],
+  'rosemary':['🌿','Rosemary'],'oregano':['🌿','Oregano'],
+  'mint':['🌿','Mint'],'chives':['🌿','Chives'],'dill':['🌿','Dill'],
+
+  // ── DRY SPICES (unique emojis where possible) ────────
+  'cumin':['🟤','Cumin'],'paprika':['🔴','Paprika'],
+  'cayenne':['🌶️','Cayenne'],'cinnamon':['🟫','Cinnamon'],
+  'turmeric':['🟡','Turmeric'],'ginger':['🫚','Ginger'],
+  'bouillon':['🍲','Bouillon'],'nutmeg':['🟤','Nutmeg'],
+
+  // ── PANTRY / OILS / SAUCES ───────────────────────────
+  'olives':['🫒','Olives'],'oil':['🫙','Oil'],
+  'vinegar':['🫙','Vinegar'],'honey':['🍯','Honey'],
+  'sugar':['🍬','Sugar'],'maple':['🍯','Maple'],
+  'broth':['🫙','Broth'],'stock':['🫙','Stock'],
+  'salt':['🧂','Salt'],
+
+  // ── NUTS / SEEDS ─────────────────────────────────────
+  'almonds':['🥜','Almonds'],'almond':['🥜','Almond'],
+  'peanuts':['🥜','Peanuts'],'peanut':['🥜','Peanut'],
+  'walnuts':['🌰','Walnuts'],'walnut':['🌰','Walnut'],
+  'cashews':['🥜','Cashews'],'cashew':['🥜','Cashew'],
+  'sesame':['🌾','Sesame'],
+
+  // ── LIQUIDS ──────────────────────────────────────────
+  'water':['🫗','Water'],'wine':['🍷','Wine'],
+  'beer':['🍺','Beer'],'juice':['🧃','Juice'],
+  'coffee':['☕','Coffee'],'tea':['🍵','Tea'],
 };
 
-function scanCuttingBoard() {
-  const text = (document.getElementById('r-ingredients')?.value || '').toLowerCase();
-  const board = document.getElementById('cutting-board');
-  const container = document.getElementById('cb-items');
-  if (!board || !container) return;
 
-  if (!text.trim()) { board.style.display = 'none'; return; }
 
-  // Sort by length descending so multi-word matches take priority
-  const sorted = Object.entries(CB_INGREDIENTS).sort((a, b) => b[0].length - a[0].length);
+// ── CUTTING BOARD SHARED ENGINE ───────────────────────
+// Pre-sort once at startup (longest keywords first for multi-word priority)
+const CB_SORTED = Object.entries(CB_INGREDIENTS).sort((a, b) => b[0].length - a[0].length);
+
+// Category order for display
+const CB_CAT = {
+  '🥩':0,'🍗':0,'🥓':0,'🍖':0,'🐟':0,'🦀':0,'🦞':0,'🍤':0,'🌭':0,'🐚':0,
+  '🥚':1,'🧊':1,
+  '🍅':2,'🧅':2,'🧄':2,'🥔':2,'🥕':2,'🥦':2,'🥬':2,'🥒':2,'🥑':2,
+  '🌽':2,'🍆':2,'🫛':2,'🫘':2,'🌶️':2,
+  '🍋':3,'🍊':3,'🍎':3,'🍌':3,'🥭':3,'🫐':3,'🍍':3,'🥥':3,'🍑':3,'🍒':3,'🍓':3,'🍇':3,'🍉':3,
+  '🧀':4,'🥛':4,'🧈':4,
+  '🌾':5,'🍞':5,'🍚':5,'🍝':5,'🍜':5,'🫓':5,
+  '🌿':6,'🟤':6,'🔴':6,'🟫':6,'🟡':6,'🫚':6,'🧪':6,
+  '🫒':7,'🫙':7,'🍯':7,'🍬':7,'🍲':7,'🥜':7,'🌰':7,
+  '🧂':8,
+  '🫗':9,'🍷':9,'🍺':9,'🧃':9,'☕':9,'🍵':9,
+};
+
+function normalizeText(t) {
+  // Normalize accented chars so árbol → arbol, jalapeño → jalapeno
+  return t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+function matchIngredients(rawText) {
+  const text = normalizeText(rawText);
   const found = new Map();
   const matchedRanges = [];
 
-  for (const [keyword, [emoji, label]] of sorted) {
-    const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`\\b${escaped}\\b`, 'gi');
+  for (const [keyword, [emoji, label]] of CB_SORTED) {
+    const normKey = normalizeText(keyword);
+    // Soft word boundary + optional plural (s/es) — handles accented chars and "avocados", "limes" etc
+    const escaped = normKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(?:^|[^a-z0-9])${escaped}(?:es|s)?(?:[^a-z0-9]|$)`, 'gi');
     let match;
     let anyMatch = false;
     while ((match = regex.exec(text)) !== null) {
-      const start = match.index;
-      const end = start + keyword.length;
-      const overlaps = matchedRanges.some(([s, e]) => start < e && end > s);
+      // The match may include a leading non-word char — adjust offset
+      const kwStart = match[0].match(/^[^a-z0-9]/) ? match.index + 1 : match.index;
+      const kwEnd = kwStart + normKey.length;
+      const overlaps = matchedRanges.some(([s, e]) => kwStart < e && kwEnd > s);
       if (!overlaps) {
         anyMatch = true;
-        matchedRanges.push([start, end]);
+        matchedRanges.push([kwStart, kwEnd]);
       }
     }
     if (anyMatch) {
-      const key = emoji; // dedup by emoji only - prevents duplicate icons
+      const key = emoji; // dedup by emoji
       if (!found.has(key)) found.set(key, { emoji, label });
     }
   }
+  return found;
+}
 
-  if (found.size === 0) { board.style.display = 'none'; return; }
-
-  board.style.display = 'block';
-
-  // Only re-render if ingredients changed
-  const newKey = [...found.keys()].join(',');
-  if (container.dataset.lastKey === newKey) return;
-  container.dataset.lastKey = newKey;
-
-  // Sort: proteins → veg/fruit → dairy → grains → spices/pantry
-  const catOrder = {
-    '🥩':0,'🍗':0,'🥓':0,'🍖':0,'🐟':0,'🦀':0,'🦞':0,'🍤':0,'🌭':0,
-    '🥚':1,'🧊':1,
-    '🍅':2,'🧅':2,'🧄':2,'🥔':2,'🥕':2,'🥦':2,'🥬':2,'🥒':2,'🥑':2,
-    '🌽':2,'🍆':2,'🫛':2,'🫘':2,'🍋':3,'🍊':3,'🍎':3,'🍌':3,'🥭':3,
-    '🫐':3,'🍍':3,'🥥':3,'🍑':3,'🍒':3,'🍓':3,'🍇':3,'🍉':3,
-    '🧀':4,'🥛':4,'🧈':4,
-    '🌾':5,'🍞':5,'🍚':5,'🍝':5,'🍜':5,'🫓':5,
-    '🧂':6,'🌿':6,'🌶️':6,'🍯':6,'🫙':6,'🍲':6,'🧪':6,'🫒':6,
-    '🫗':7,'🍷':7,'🍺':7,'🧃':7,'☕':7,'🍵':7,'🍫':7,
-  };
-  const getCat = (e) => catOrder[e] ?? 8;
+function renderCBItems(found, container) {
+  const getCat = (e) => CB_CAT[e] ?? 10;
   const items = [...found.values()].sort((a, b) => getCat(a.emoji) - getCat(b.emoji));
-
   container.innerHTML = items.map(({ emoji, label }) =>
     `<div class="cb-item">
       <div class="cb-item-emoji">${emoji}</div>
@@ -1605,6 +1650,25 @@ function scanCuttingBoard() {
     </div>`
   ).join('');
 }
+
+function scanCuttingBoard() {
+  const rawText = document.getElementById('r-ingredients')?.value || '';
+  const board = document.getElementById('cutting-board');
+  const container = document.getElementById('cb-items');
+  if (!board || !container) return;
+
+  if (!rawText.trim()) { board.style.display = 'none'; return; }
+
+  const found = matchIngredients(rawText);
+  if (found.size === 0) { board.style.display = 'none'; return; }
+
+  board.style.display = 'block';
+  const newKey = [...found.keys()].join(',');
+  if (container.dataset.lastKey === newKey) return;
+  container.dataset.lastKey = newKey;
+  renderCBItems(found, container);
+}
+
 
 // ── PHOTO UPLOAD ──────────────────────────────────────
 let selectedPhoto = null;
@@ -2446,7 +2510,10 @@ function scaleIngredient(line, ratio) {
 // ── RENDER ────────────────────────────────────────────
 function renderIngredients() {
   const ratio = currentServings / baseServings;
-  const lines = (currentRecipe.ingredients || '').split('\n').filter(l => l.trim());
+  // Filter out any section headers that leaked into saved ingredient data
+  const isHeader = /^(📋|🥦|📝|#+|\*\*|steps?|ingredients?|method|directions?)\s*$/i;
+  const lines = (currentRecipe.ingredients || '').split('\n')
+    .filter(l => l.trim() && !isHeader.test(l.trim()));
   document.getElementById('d-ingredients').innerHTML = lines.map((line, i) => {
     const scaled = scaleIngredient(line, ratio);
     const badge = inPantry(line) ? '<span class="have-badge">✓ Have</span>' : '';
@@ -2639,44 +2706,10 @@ function showDetail(id) {
   const detailBoard = document.getElementById('detail-cutting-board');
   const detailItems = document.getElementById('detail-cb-items');
   if (detailBoard && detailItems && currentRecipe.ingredients) {
-    const text = currentRecipe.ingredients.toLowerCase();
-    const sorted = Object.entries(CB_INGREDIENTS).sort((a, b) => b[0].length - a[0].length);
-    const found = new Map();
-    const matchedRanges = [];
-    for (const [keyword, [emoji, label]] of sorted) {
-      const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(`\\b${escaped}\\b`, 'gi');
-      let match;
-      let anyMatch = false;
-      while ((match = regex.exec(text)) !== null) {
-        const start = match.index;
-        const end = start + keyword.length;
-        const overlaps = matchedRanges.some(([s, e]) => start < e && end > s);
-        if (!overlaps) { anyMatch = true; matchedRanges.push([start, end]); }
-      }
-      if (anyMatch) {
-        const key = emoji; // dedup by emoji only - prevents duplicate icons
-        if (!found.has(key)) found.set(key, { emoji, label });
-      }
-    }
+    const found = matchIngredients(currentRecipe.ingredients);
     if (found.size > 0) {
       detailBoard.style.display = 'block';
-      const catOrder = {
-        '🥩':0,'🍗':0,'🥓':0,'🍖':0,'🐟':0,'🦀':0,'🦞':0,'🍤':0,'🌭':0,
-        '🥚':1,'🧊':1,'🍅':2,'🧅':2,'🧄':2,'🥔':2,'🥕':2,'🥦':2,'🥬':2,
-        '🥒':2,'🥑':2,'🌽':2,'🍆':2,'🫛':2,'🫘':2,'🍋':3,'🍊':3,'🍎':3,
-        '🍌':3,'🥭':3,'🫐':3,'🍍':3,'🥥':3,'🧀':4,'🥛':4,'🧈':4,
-        '🌾':5,'🍞':5,'🍚':5,'🍝':5,'🍜':5,'🫓':5,
-        '🧂':6,'🌿':6,'🌶️':6,'🍯':6,'🫙':6,'🍲':6,'🧪':6,'🫒':6,
-      };
-      const getCat = (e) => catOrder[e] ?? 8;
-      const items = [...found.values()].sort((a,b) => getCat(a.emoji) - getCat(b.emoji));
-      detailItems.innerHTML = items.map(({ emoji, label }) =>
-        `<div class="cb-item">
-          <div class="cb-item-emoji">${emoji}</div>
-          <div class="cb-item-label">${label}</div>
-        </div>`
-      ).join('');
+      renderCBItems(found, detailItems);
     } else {
       detailBoard.style.display = 'none';
     }
@@ -3185,8 +3218,10 @@ function saveRecipe() {
       difficulty: document.getElementById('r-difficulty').value,
       prep: document.getElementById('r-prep').value.trim(),
       cook: document.getElementById('r-cook').value.trim(),
-      ingredients: document.getElementById('r-ingredients').value.trim(),
-      steps: document.getElementById('r-steps').value.trim(),
+      ingredients: document.getElementById('r-ingredients').value.trim()
+        .split('\n').filter(l => l.trim() && !/^(📋|🥦|📝|steps?|ingredients?|method|directions?)\s*:?\s*$/i.test(l.trim())).join('\n'),
+      steps: document.getElementById('r-steps').value.trim()
+        .split('\n').filter(l => l.trim() && !/^(📋|🥦|📝|steps?|ingredients?|method|directions?)\s*:?\s*$/i.test(l.trim())).join('\n'),
       notes: document.getElementById('r-notes').value.trim(),
       fav: editingId ? (recipes.find(r => r.id === editingId)?.fav || false) : false,
       rating: editingId ? (recipes.find(r => r.id === editingId)?.rating || 0) : 0,
